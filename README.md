@@ -41,10 +41,6 @@ This will:
 
 ## 🧱 Folder Structure
 
-```
-
-```
-
 dotfiles/
 ├── config/ # Symlinked to ~/.config/
 │ ├── fish/
@@ -63,10 +59,6 @@ dotfiles/
 │ └── pkg-brew.txt # Homebrew packages
 ├── setup.sh # One-line installer entrypoint
 └── README.md
-
-```
-
-```
 
 ## 📚 Manual Usage
 
