@@ -31,9 +31,9 @@ This will:
 Clone and install manually:
 
 ```bash
-git clone https://github.com/yourusername/dotfiles ~/.dotfiles
-cd ~/.dotfiles
-chmod +x install/install.sh install/package.sh
+git clone https://github.com/warmdev17/dotfiles ~/dotfiles
+cd ~/dotfiles
+find . -type f -name "*.sh" -exec chmod +x {} \;
 ./install/install.sh
 ```
 

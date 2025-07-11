@@ -1,0 +1,34 @@
+{
+  "include standard bool header": {
+    "prefix": ["icb"],
+    "body": "#include <stdbool.h>"
+  },
+  "include standard in/out header": {
+    "prefix": ["icio"],
+    "body": "#include <stdio.h>"
+  },
+  "Main funciton": {
+    "prefix": "mfr",
+    "body": ["int main() {", "  $1;", "  return 0;", "}"]
+  },
+  "print a interger": {
+    "prefix": "prid",
+    "body": "printf(\"%d\", $1);"
+  },
+  "print a float": {
+    "prefix": "prif",
+    "body": "printf(\"%f\", $2);"
+  },
+  "print a string": {
+    "prefix": "pris",
+    "body": "printf(\"%s\", $1);"
+  },
+  "print a char": {
+    "prefix": "pric",
+    "body": "printf(\"%c\", $1);"
+  },
+  "for loop": {
+    "prefix": "for",
+    "body": ["for (let ${1:i} = 0; ${1} < ${2:len}; ${1}++) {", "  $0", "}"]
+  }
+}

@@ -1,0 +1,9 @@
+arduino-cli
+bfg
+lazygit
+libvterm
+msgpack
+neovim
+node
+oh-my-posh
+python@3.12
