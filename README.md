@@ -37,10 +37,6 @@ chmod +x install/install.sh install/package.sh
 ./install/install.sh
 ```
 
-```
-
-```
-
 You'll be guided through:
 
 - Selecting packages to install from pkg-\*.txt (optional)
