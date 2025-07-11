@@ -25,18 +25,18 @@ bash <(curl -s https://raw.githubusercontent.com/warmdev/dotfiles/main/setup.sh)
 
 This will:
 
-Install Git (if needed)
+- Install Git (if needed)
 
-Clone your dotfiles repo to ~/.dotfiles
+- Clone your dotfiles repo to ~/.dotfiles
 
-Launch an interactive installer:
+- Launch an interactive installer:
 
-Optionally install packages
+- Optionally install packages
 
-Select dotfiles folders to install (via FZF)
+- Select dotfiles folders to install (via FZF)
 
-Symlink configs into ~/.config using stow
+- Symlink configs into ~/.config using stow
 
-Your last folder selection is saved to ~/.config/.dotfiles-selected and auto-loaded next time.
+- Your last folder selection is saved to ~/.config/.dotfiles-selected and auto-loaded next time.
 
 ## 📚 Usage
