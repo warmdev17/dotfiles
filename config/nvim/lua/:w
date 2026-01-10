@@ -1,0 +1,16 @@
+return {
+  "mason-org/mason.nvim",
+  opts = {
+    ensure_installed = {
+      "stylua",
+      "shellcheck",
+      "shfmt",
+      "flake8",
+      "clangd",
+      "clang-format",
+      "cpplint",
+      "css-lsp",
+      "emmet-language-server",
+    },
+  },
+}

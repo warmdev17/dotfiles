@@ -1,0 +1,44 @@
+Requirements:
+  - glab ( gitlab cli )
+  - git
+  - fzf
+  - jq
+  - ...
+
+Config file:
+  ~/.config/ash
+    -> config.json
+      {
+        "host": "git.rikkei.edu.vn",
+        "token": "xxxxxxxxxxxxxxxx",
+        "groups": {
+          // Group
+          "IT108_K25_LeTrungHieu": {
+            // Group id | group path
+            "id": "001",
+            "path": "it108_k25_letrunghieu",
+
+            // List of subgroup
+            "subgroup": {
+              "Session1": {
+                "id": "xxx",
+                "path": "it108_k25_letrunghieu/session1"
+              },
+              ...,
+            }
+          },
+          ...,
+        }
+      }
+
+Các bước sử dụng:
+  Xác thực tài khoản gitlab self host của trường
+    ash verify -t <token>
+      1. glab auth login --hostname git.rikkei.edu.vn --token <token> --api-host git.rikkei.edu.vn:443 --api-protocol https --git-protocol https
+      2. glab config set -g host git.rikkei.edu.vn
+
+  Lấy tất cả group name và group id từ tài khoản qua api và ghi vào ~/.config/ash/groups.json
+    ash group -g
+      -> glab api "groups?owned=true&top_level_only=true" --paginate | jq '.[] | {id: .id, full_name: .full_name}'
+        -> 
+

@@ -1,0 +1,574 @@
+# ash.fish — project-local GitLab helper (Pro edition)
+# Requires: fish >= 3.4, jq, glab, git
+# Project-local metadata lives in .ash/config.json (like .git/)
+# This version adds: project-root discovery, glab auth preflight, dry-run, verbose,
+# .ashignore support, status view, basic repo bootstrap, and safer error codes.
+
+# -----------------------------
+# Utility: printing & flags
+# -----------------------------
+set -g __ASH_DIR .ash
+set -g __ASH_CONFIG $__ASH_DIR/config.json
+set -g __ASH_IGNORE $__ASH_DIR/ashignore
+
+function _ash::ok
+    set_color green
+    echo "✔ $argv"
+    set_color normal
+end
+function _ash::warn
+    set_color yellow
+    echo "⚠ $argv"
+    set_color normal
+end
+function _ash::err
+    set_color red
+    echo "✘ $argv" 1>&2
+    set_color normal
+end
+function _ash::info
+    set_color blue
+    echo "ℹ $argv"
+    set_color normal
+end
+
+set -g __ASH_VERBOSE 0
+set -g __ASH_DRYRUN 0
+
+function _ash::v
+    if test $__ASH_VERBOSE -eq 1
+        _ash::info $argv
+    end
+end
+
+# -----------------------------
+# Project root discovery (.ash like .git)
+# -----------------------------
+function _ash::find_root
+    set -l dir (pwd)
+    while true
+        if test -d "$dir/{$__ASH_DIR}"
+            echo $dir
+            return 0
+        end
+        if test "$dir" = /
+            break
+        end
+        set dir (dirname $dir)
+    end
+    return 1
+end
+
+function _ash::cd_root
+    set -l root (_ash::find_root)
+    if test -z "$root"
+        _ash::err "Not inside an ash project (missing .ash/). Run 'ash init' at your project root."
+        return 1
+    end
+    cd $root
+end
+
+# -----------------------------
+# Dependencies & auth
+# -----------------------------
+function _ash::need_bin
+    for b in $argv
+        if not type -q $b
+            _ash::err "Missing dependency: $b"
+            return 1
+        end
+    end
+end
+
+function _ash::glab_ready
+    _ash::need_bin glab; or return 1
+    glab auth status >/dev/null 2>&1
+    if test $status -ne 0
+        _ash::err "glab is not authenticated. Run: glab auth login"
+        return 1
+    end
+end
+
+# -----------------------------
+# Config helpers
+# -----------------------------
+function _ash::ensure_config_dir
+    if not test -d $__ASH_DIR
+        mkdir -p $__ASH_DIR
+    end
+end
+
+function _ash::config_exists
+    test -f $__ASH_CONFIG
+end
+
+function _ash::ensure_config_exists
+    if not _ash::config_exists
+        _ash::err "No $__ASH_CONFIG found. Run: ash init [--group-id <ID>]"
+        return 1
+    end
+end
+
+function _ash::init_config
+    _ash::ensure_config_dir
+    if not _ash::config_exists
+        echo '{"group_id": null, "subgroups": {}}' >$__ASH_CONFIG
+        _ash::ok "Initialized $__ASH_CONFIG"
+    else
+        _ash::warn "Config already exists at $__ASH_CONFIG"
+    end
+    if not test -f $__ASH_IGNORE
+        # default ignore patterns (one per line)
+        printf "# Paths (relative) to skip when submitting
+node_modules
+.git
+.DS_Store
+" >$__ASH_IGNORE
+    end
+end
+
+function _ash::jget
+    jq -r "$argv[1] // empty" $__ASH_CONFIG 2>/dev/null
+end
+
+function _ash::japply
+    set -l filter $argv[1]
+    set -l msg $argv[2]
+    set -l tmp (mktemp)
+    if not jq "$filter" $__ASH_CONFIG >$tmp
+        rm -f $tmp
+        _ash::err "Failed to update config (jq error)"
+        return 1
+    end
+    mv $tmp $__ASH_CONFIG
+    if test -n "$msg"
+        _ash::ok $msg
+    end
+end
+
+function _ash::require_group_id
+    set -l gid (_ash::jget '.group_id')
+    if test -z "$gid"
+        _ash::err "group_id is missing in $__ASH_CONFIG. Use 'ash group --use <ID>' or 'ash group --create ...'"
+        return 1
+    end
+end
+
+function _ash::session_key
+    echo session$argv[1]
+end
+function _ash::get_subgroup_id
+    set -l key (_ash::session_key $argv[1])
+    _ash::jget ".subgroups.$key"
+end
+
+# -----------------------------
+# Common flag parsing for -v/--verbose and --dry-run
+# -----------------------------
+function _ash::consume_common_flags
+    set -g __ASH_VERBOSE 0
+    set -g __ASH_DRYRUN 0
+    for i in (seq (count $argv))
+        switch $argv[$i]
+            case -v --verbose
+                set -g __ASH_VERBOSE 1
+                set -e argv[$i]
+                set i (math $i - 1)
+            case --dry-run
+                set -g __ASH_DRYRUN 1
+                set -e argv[$i]
+                set i (math $i - 1)
+        end
+    end
+    echo $argv
+end
+
+# -----------------------------
+# ash init
+# -----------------------------
+function ash::init
+    set argv (_ash::consume_common_flags $argv)
+    argparse --name=ash.init h/help 'group-id=' -- $argv; or return 1
+    if set -ql _flag_help
+        echo "Usage: ash init [--group-id <ID>] [-v|--verbose] [--dry-run]"
+        return 0
+    end
+
+    if test $__ASH_DRYRUN -eq 1
+        _ash::info "(dry-run) would create .ash/ and config.json"
+        return 0
+    end
+    _ash::init_config
+    if set -ql _flag_group_id
+        _ash::japply ".group_id = \"$_flag_group_id\" | ." "Set group_id=$_flag_group_id"; or return 1
+    end
+end
+
+# -----------------------------
+# ash status — quick overview
+# -----------------------------
+function ash::status
+    _ash::cd_root; or return 1
+    _ash::ensure_config_exists; or return 1
+    set -l gid (_ash::jget '.group_id')
+    echo "group_id: $gid"
+    set -l keys (jq -r '.subgroups | keys[]?' $__ASH_CONFIG)
+    if test -z "$keys"
+        echo "subgroups: (none)"
+    else
+        echo "subgroups:"
+        for k in $keys
+            set -l id (jq -r ".subgroups[\"$k\"]" $__ASH_CONFIG)
+            echo "  $k → $id"
+        end
+    end
+end
+
+# -----------------------------
+# ash group — manage course-level GitLab group
+# -----------------------------
+function ash::group
+    set argv (_ash::consume_common_flags $argv)
+    argparse --name=ash.group h/help create 'use=' 'name=' 'path=' 'parent=' -- $argv; or return 1
+    if set -ql _flag_help
+        echo "Usage: ash group [--create --name <NAME> [--path <PATH>] [--parent <PARENT_ID>]] | [--use <GROUP_ID>] [-v] [--dry-run]"
+        return 0
+    end
+    _ash::cd_root; or return 1
+    _ash::ensure_config_exists; or return 1
+
+    if set -ql _flag_use
+        if test $__ASH_DRYRUN -eq 1
+            _ash::info "(dry-run) would set group_id=$_flag_use"
+            return 0
+        end
+        _ash::japply ".group_id = \"$_flag_use\" | ." "Using existing group_id=$_flag_use"; or return 1
+        return 0
+    end
+
+    if set -ql _flag_create
+        if not set -ql _flag_name
+            _ash::err "--name is required for --create"
+            return 1
+        end
+        if test $__ASH_DRYRUN -eq 1
+            _ash::info "(dry-run) would create group --name '$_flag_name'"
+            return 0
+        end
+        _ash::glab_ready; or return 1
+        set -l args create group --name "$_flag_name"
+        if set -ql _flag_path
+            set args $args --path "$_flag_path"
+        end
+        if set -ql _flag_parent
+            set args $args --parent-id "$_flag_parent"
+        end
+        _ash::v "glab $args"
+        set -l out (glab $args --format json 2>/dev/null)
+        if test $status -ne 0
+            _ash::err "glab failed to create group"
+            return 1
+        end
+        set -l gid (echo $out | jq -r '.id')
+        if test -z "$gid" -o "$gid" = null
+            _ash::err "Could not parse group id"
+            return 1
+        end
+        _ash::japply ".group_id = $gid | ." "Created and stored group_id=$gid"
+        return 0
+    end
+
+    _ash::err "No action. Use --create or --use. See 'ash group --help'"
+    return 1
+end
+
+# -----------------------------
+# ash subgroup — create/set subgroup per session{n}
+# -----------------------------
+function ash::subgroup
+    set argv (_ash::consume_common_flags $argv)
+    argparse --name=ash.subgroup h/help create 'use=' 'session=' 'name=' -- $argv; or return 1
+    if set -ql _flag_help
+        echo "Usage: ash subgroup --session <N> [--create --name <NAME>] | [--use <SUBGROUP_ID>] [-v] [--dry-run]"
+        return 0
+    end
+    _ash::cd_root; or return 1
+    _ash::ensure_config_exists; or return 1
+    _ash::require_group_id; or return 1
+    if not set -ql _flag_session
+        _ash::err "--session <N> is required"
+        return 1
+    end
+
+    set -l skey (_ash::session_key $_flag_session)
+
+    if set -ql _flag_use
+        if test $__ASH_DRYRUN -eq 1
+            _ash::info "(dry-run) would save $skey=$_flag_use"
+            return 0
+        end
+        _ash::japply ".subgroups.$skey = \"$_flag_use\" | ." "Saved $skey=$_flag_use"; or return 1
+        return 0
+    end
+
+    if set -ql _flag_create
+        if not set -ql _flag_name
+            _ash::err "--name is required for --create"
+            return 1
+        end
+        if test $__ASH_DRYRUN -eq 1
+            _ash::info "(dry-run) would create subgroup '$$_flag_name' under group"
+            return 0
+        end
+        _ash::glab_ready; or return 1
+        set -l gid (_ash::jget '.group_id')
+        set -l out (glab create group --name "$_flag_name" --parent-id $gid --format json 2>/dev/null)
+        if test $status -ne 0
+            _ash::err "glab failed to create subgroup"
+            return 1
+        end
+        set -l sgid (echo $out | jq -r '.id')
+        if test -z "$sgid" -o "$sgid" = null
+            _ash::err "Could not parse subgroup id"
+            return 1
+        end
+        _ash::japply ".subgroups.$skey = $sgid | ." "Created and stored $skey=$sgid"
+        return 0
+    end
+
+    _ash::err "No action. Use --create or --use. See 'ash subgroup --help'"
+    return 1
+end
+
+# -----------------------------
+# ash repo create — bootstrap baitap repos in a session (local + remote)
+# Note: Needs subgroup *full_path*. We derive it from subgroup id via glab.
+# -----------------------------
+function _ash::group_full_path_by_id
+    set -l id $argv[1]
+    set -l json (glab group -o json view $id 2>/dev/null)
+    if test $status -ne 0
+        return 1
+    end
+    echo (echo $json | jq -r '.full_path')
+end
+
+function ash::repo
+    set argv (_ash::consume_common_flags $argv)
+    argparse --name=ash.repo h/help create 'session=' 'hometasks=' private -- $argv; or return 1
+    if set -ql _flag_help
+        echo "Usage: ash repo --create --session <N> [-h <LIST...>] [--private] [-v] [--dry-run]"
+        echo "Creates missing local repos and remote projects under the mapped subgroup."
+        return 0
+    end
+    _ash::cd_root; or return 1
+    _ash::ensure_config_exists; or return 1
+    _ash::require_group_id; or return 1
+    _ash::glab_ready; or return 1
+    if not set -ql _flag_create
+        _ash::err "Only --create supported now"
+        return 1
+    end
+    if not set -ql _flag_session
+        _ash::err "--session <N> required"
+        return 1
+    end
+
+    set -l sgid (_ash::get_subgroup_id $_flag_session)
+    if test -z "$sgid"
+        _ash::err "No subgroup id for session$_flag_session. Run 'ash subgroup --session $_flag_session --use <ID>' first."
+        return 1
+    end
+
+    set -l ns (_ash::group_full_path_by_id $sgid)
+    if test -z "$ns" -o "$ns" = null
+        _ash::err "Cannot resolve subgroup full_path"
+        return 1
+    end
+
+    set -l session_dir session$_flag_session
+    if not test -d $session_dir
+        mkdir -p $session_dir
+    end
+
+    set -l targets
+    if set -ql _flag_hometasks
+        for n in $_flag_hometasks
+            set targets $targets baitap$n
+        end
+    else
+        _ash::err "Provide -h list of baitap numbers to create (e.g., -h 1 2 3)"
+        return 1
+    end
+
+    for name in $targets
+        set -l local_dir $session_dir/$name
+        set -l remote_path "$ns/$name"
+        if test $__ASH_DRYRUN -eq 1
+            _ash::info "(dry-run) would create remote: $remote_path and local: $local_dir"
+            continue
+        end
+        _ash::v "glab repo create $remote_path"
+        if set -ql _flag_private
+            glab repo create $remote_path --private --readme >/dev/null 2>&1
+        else
+            glab repo create $remote_path --internal --readme >/dev/null 2>&1
+        end
+        if not test -d $local_dir
+            mkdir -p $local_dir
+            pushd $local_dir >/dev/null
+            git init -q
+            git remote add origin (glab repo view $remote_path --json ssh_url_to_repo -q | jq -r '.ssh_url_to_repo')
+            git pull origin main >/dev/null 2>&1
+            popd >/dev/null
+            _ash::ok "Bootstrapped $local_dir ↔ $remote_path"
+        else
+            _ash::warn "$local_dir already exists; skipped local init"
+        end
+    end
+end
+
+# -----------------------------
+# ash submit — push repos under session{N}
+# Adds: --dry-run, -v, .ashignore, and optional parallel (-p)
+# -----------------------------
+function _ash::should_skip
+    set -l path $argv[1]
+    if not test -f $__ASH_IGNORE
+        return 1
+    end
+    for pat in (cat $__ASH_IGNORE)
+        if string match -q "#*" $pat
+            continue
+        end
+        if test -z "$pat"
+            continue
+        end
+        if string match -q -r ".*" $pat
+            if string match -q $pat $path
+                return 0
+            end
+        end
+    end
+    return 1
+end
+
+function _ash::submit_one
+    set -l t $argv[1]
+    if not test -d $t
+        _ash::warn "Skip missing: $t"
+        return 0
+    end
+    if _ash::should_skip $t
+        _ash::warn "Ignored by .ash/ashignore: $t"
+        return 0
+    end
+    if not test -d $t/.git
+        _ash::warn "Skip (not a git repo): $t"
+        return 0
+    end
+
+    if test $__ASH_DRYRUN -eq 1
+        _ash::info "(dry-run) would submit $t"
+        return 0
+    end
+
+    _ash::v "Submitting: $t"
+    pushd $t >/dev/null
+    git add -A
+    if git diff --cached --quiet
+        _ash::warn "No staged changes in $t"
+    else
+        set -l msg "ash: submit ("(date "+%Y-%m-%d %H:%M:%S")")"
+        git commit -m "$msg" >/dev/null
+    end
+    git push >/dev/null
+    if test $status -eq 0
+        _ash::ok "Pushed $t"
+    else
+        _ash::err "Push failed in $t"
+    end
+    popd >/dev/null
+end
+
+function ash::submit
+    set argv (_ash::consume_common_flags $argv)
+    argparse --name=ash.submit h/help 's/session=' 'hometasks=' p/parallel -- $argv; or return 1
+    if set -ql _flag_help
+        echo "Usage: ash submit -s <SESSION_NUM> [-h <LIST...>] [-p] [-v] [--dry-run]"
+        echo "-s/--session   Session number (folder sessionN)"
+        echo "-h             Specific baitap numbers (e.g., -h 1 5 7). Omit to submit all baitap*"
+        echo "-p/--parallel  Submit in parallel (best-effort)"
+        return 0
+    end
+
+    _ash::cd_root; or return 1
+
+    if not set -ql _flag_session
+        _ash::err "--session is required"
+        return 1
+    end
+    set -l session_dir session$_flag_session
+    if not test -d $session_dir
+        _ash::err "Folder '$session_dir' does not exist in $(pwd)"
+        return 1
+    end
+
+    set -l targets
+    if set -ql _flag_hometasks
+        for n in $_flag_hometasks
+            set targets $targets $session_dir/baitap$n
+        end
+    else
+        set targets (ls -d $session_dir/baitap*/ ^/dev/null)
+    end
+
+    if test (count $targets) -eq 0
+        _ash::warn "No targets to submit."
+        return 0
+    end
+
+    _ash::need_bin git; or return 1
+
+    if set -ql _flag_parallel
+        for t in $targets
+            _ash::submit_one $t &
+        end
+        wait
+    else
+        for t in $targets
+            _ash::submit_one $t
+        end
+    end
+end
+
+# -----------------------------
+# Entrypoint: ash <command> ...
+# -----------------------------
+function ash
+    set -l cmd $argv[1]
+    if test -z "$cmd"; or contains --help $argv; or test "$cmd" = help
+        echo "ash — project-local GitLab helper"
+        echo "Commands: init, status, group, subgroup, repo, submit"
+        echo "Use -v/--verbose and --dry-run where supported"
+        return 0
+    end
+    set -e argv[1]
+    switch $cmd
+        case init
+            ash::init $argv
+        case status
+            ash::status $argv
+        case group
+            ash::group $argv
+        case subgroup
+            ash::subgroup $argv
+        case repo
+            ash::repo $argv
+        case submit
+            ash::submit $argv
+        case '*'
+            _ash::err "Unknown command: $cmd"
+            return 1
+    end
+end
