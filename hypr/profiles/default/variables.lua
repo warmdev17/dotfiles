@@ -14,5 +14,6 @@ return {
 
     animationsEnabled = false,
     waybarStart = "$HOME/.config/hypr/script/waybar.sh",
-    wallpaperStart = "awww-daemon\nsleep 1 && awww img $HOME/Pictures/wallpapers/MaiPhuongDangIu.jpg --transition-type center",
+    wallpaperDaemon = "awww-daemon",
+    wallpaperCmd = "sleep 1 && awww img $HOME/Pictures/wallpapers/MaiPhuongDangIu.jpg --transition-type center",
 }
