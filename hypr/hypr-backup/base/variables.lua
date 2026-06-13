@@ -1,0 +1,5 @@
+return {
+	binds = {
+		terminal = "kitty",
+	},
+}
