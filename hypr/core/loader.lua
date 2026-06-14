@@ -1,11 +1,27 @@
 local M = {}
 
+local function get_nested(vars, key)
+	local val = vars
+	for part in key:gmatch("[^%.]+") do
+		if type(val) == "table" then
+			val = val[part]
+		else
+			return nil
+		end
+	end
+	return val
+end
+
 local function interpolate(str, vars)
 	if type(str) ~= "string" then
 		return str
 	end
 	return (str:gsub("{{(.-)}}", function(key)
-		return vars[key] or ""
+		local val = get_nested(vars, key)
+		if val ~= nil then
+			return tostring(val)
+		end
+		return ""
 	end))
 end
 
@@ -60,21 +76,21 @@ function M.apply(cfg)
 			elseif b.action == "window.drag" then
 				action_fn = hl.dsp.window.drag()
 			elseif b.action == "window.resize" then
-				action_fn = hl.dsp.window.resize(b.options)
+				action_fn = hl.dsp.window.resize(args)
 			elseif b.action == "window.close" then
 				action_fn = hl.dsp.window.close()
 			elseif b.action == "exit" then
 				action_fn = hl.dsp.exit()
 			elseif b.action == "window.float" then
-				action_fn = hl.dsp.window.float(b.options)
+				action_fn = hl.dsp.window.float(args)
 			elseif b.action == "window.fullscreen" then
-				action_fn = hl.dsp.window.fullscreen(b.options)
+				action_fn = hl.dsp.window.fullscreen(args)
 			elseif b.action == "window.pin" then
-				action_fn = hl.dsp.window.pin(b.options)
+				action_fn = hl.dsp.window.pin(args)
 			elseif b.action == "focus" then
-				action_fn = hl.dsp.focus(b.options)
+				action_fn = hl.dsp.focus(args)
 			elseif b.action == "window.move" then
-				action_fn = hl.dsp.window.move(b.options)
+				action_fn = hl.dsp.window.move(args)
 			elseif b.action == "window.center" then
 				action_fn = hl.dsp.window.center()
 			elseif b.action == "submap" then
@@ -98,7 +114,7 @@ function M.apply(cfg)
 					if b.action == "exec_cmd" then
 						action_fn = hl.dsp.exec_cmd(args)
 					elseif b.action == "window.resize" then
-						action_fn = hl.dsp.window.resize(b.options)
+						action_fn = hl.dsp.window.resize(args)
 					elseif b.action == "submap" then
 						action_fn = hl.dsp.submap(args)
 					end
@@ -120,6 +136,16 @@ function M.apply(cfg)
 				end
 			end
 		end)
+	end
+
+	-- 6. Apply exec
+	if cfg.exec then
+		for _, cmd in pairs(cfg.exec) do
+			if cmd and cmd ~= "" then
+				local interpolated_cmd = interpolate(cmd, vars)
+				hl.exec_cmd(interpolated_cmd)
+			end
+		end
 	end
 end
 

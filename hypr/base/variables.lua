@@ -1,14 +1,19 @@
 return {
-    mainMod = "SUPER",
-    altMod = "ALT",
+	mainMod = "SUPER",
+	altMod = "ALT",
 
-    terminal = "kitty",
-    fileManager = "thunar",
-    browser = "brave --password-store=basic",
-    menu = "rofi -show drun",
+	terminal = { cmd = "kitty" },
+	fileManager = { cmd = "thunar" },
+	browser = { cmd = "brave --password-store=basic" },
+	menu = { cmd = "rofi -show drun" },
 
-    waybarToggle = "~/.config/waybar/script/toggle.sh",
-    wallpaperSelector = "~/.config/hypr/script/wallpaper_selector.sh",
-    lockscreen = "~/.config/hypr/script/lockscreen.sh",
-    clipboard = "~/.config/hypr/script/clipboard.sh | wl-copy",
+	waybar = {
+		toggle = "~/.config/waybar/script/toggle.sh",
+	},
+	wallpaper = {
+		selector = "~/.config/hypr/script/wallpaper_selector.sh",
+	},
+
+	lockscreen = { cmd = "~/.config/hypr/script/lockscreen.sh" },
+	clipboard = { cmd = "~/.config/hypr/script/clipboard.sh | wl-copy" },
 }

@@ -1,5 +1,0 @@
-return {
-	binds = {
-		terminal = "kitty",
-	},
-}

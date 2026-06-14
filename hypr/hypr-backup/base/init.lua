@@ -1,5 +1,0 @@
-require("variables")
-require("autostart")
-require("binds")
-require("options")
-require("rules")
