@@ -16,4 +16,5 @@ return {
 
 	lockscreen = { cmd = "~/.config/hypr/script/lockscreen.sh" },
 	clipboard = { cmd = "~/.config/hypr/script/clipboard.sh | wl-copy" },
+	toggleProfile = { cmd = "~/.config/hypr/script/toggle-profile.sh" },
 }

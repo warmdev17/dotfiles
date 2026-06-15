@@ -47,6 +47,8 @@ local binds = {
 	},
 	lockscreen = { key = "{{altMod}} + SHIFT + L", action = "exec_cmd", args = "{{lockscreen.cmd}}" },
 
+	toggle_profile = { key = "{{mainMod}} + SHIFT + T", action = "exec_cmd", args = "{{toggleProfile.cmd}}" },
+
 	focus_l = { key = "{{mainMod}} + H", action = "focus", args = { direction = "left" } },
 	focus_d = { key = "{{mainMod}} + J", action = "focus", args = { direction = "down" } },
 	focus_u = { key = "{{mainMod}} + K", action = "focus", args = { direction = "up" } },
