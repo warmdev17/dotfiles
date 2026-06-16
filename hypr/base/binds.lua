@@ -17,7 +17,7 @@ local binds = {
 
 	terminal = { key = "{{mainMod}} + Return", action = "exec_cmd", args = "{{terminal.cmd}}" },
 	close = { key = "{{mainMod}} + Q", action = "window.close" },
-	exit = { key = "{{mainMod}} + M", action = "exit" },
+	exit = { key = "{{mainMod}} + SHIFT + escape", action = "exit" },
 	fileManager = { key = "{{mainMod}} + E", action = "exec_cmd", args = "{{fileManager.cmd}}" },
 	browser = { key = "{{mainMod}} + B", action = "exec_cmd", args = "{{browser.cmd}}" },
 	waybarToggle = { key = "{{mainMod}} + W", action = "exec_cmd", args = "{{waybar.toggle}}" },

@@ -12,9 +12,9 @@ return {
 	},
 
 	autostart = {
-		waybar = "waybar",
+		waybar = "waybar -c {{waybar.config}} -s {{waybar.style}}",
 		wallpaper_daemon = "awww-daemon",
-		wallpaper_cmd = "sleep 1 && awww img $HOME/Pictures/wallpapers/solid-color-image.png --transition-type center",
+		wallpaper_cmd = "sleep 1 && awww img $HOME/Pictures/wallpapers/solid-color-image.png --transition-type none",
 	},
 
 	-- 3. EXEC (Runs on EVERY reload / profile switch)
@@ -39,6 +39,11 @@ return {
 			},
 			decoration = {
 				rounding = 0,
+			},
+			input = {
+				touchpad = {
+					disable_while_typing = false,
+				},
 			},
 		},
 	},
