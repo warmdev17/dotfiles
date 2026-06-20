@@ -10,7 +10,9 @@ return {
 	power_btn = "hyprctl keyword 'device[power-button]:enabled' false",
 	dbus = "dbus-update-activation-environment --all",
 	keyring = "gnome-keyring-daemon --start --components=secrets",
-	greenclip = "greenclip daemon",
+	cliphist_text = "wl-paste --type text --watch cliphist store",
+	cliphist_image = "wl-paste --type image --watch cliphist store",
+	cliphist_restore = "bash -c 'sleep 1 && cliphist list | head -n 1 | cliphist decode | wl-copy'",
 
 	waybar = "$HOME/.config/hypr/script/waybar.sh",
 	wallpaper_daemon = "awww-daemon",

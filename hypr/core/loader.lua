@@ -132,7 +132,8 @@ function M.apply(cfg)
 		hl.on("hyprland.start", function()
 			for _, cmd in pairs(cfg.autostart) do
 				if cmd and cmd ~= "" then
-					hl.exec_cmd(cmd)
+					local interpolated_cmd = interpolate(cmd, vars)
+					hl.exec_cmd(interpolated_cmd)
 				end
 			end
 		end)

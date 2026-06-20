@@ -52,6 +52,15 @@ return {
 		-- general = {
 		--     ["col.active_border"] = "rgba(ff0000ff)",
 		-- },
+
+		-- Example: enable/disable specific devices (e.g. keyboards, touchpads)
+		-- To find the exact name of your device, run `hyprctl devices` in your terminal.
+		-- devices = {
+		--     {
+		--         name = "my-device-name",
+		--         enabled = false,
+		--     },
+		-- },
 	},
 
 	-- 5. OVERRIDING OR ADDING KEYBINDS
