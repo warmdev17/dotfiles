@@ -1,7 +1,7 @@
 return {
 	variables = {
 		browser = { cmd = "brave --password-store=basic" },
-		menu = { cmd = "rofi -show drun" },
+		menu = { cmd = "rofi -show drun -theme /home/warmdev/.config/rofi/theme_minimal.rasi" },
 		terminal = { cmd = "kitty --config /home/warmdev/.config/kitty/minimal.conf" },
 		waybar = {
 			toggle = "/home/warmdev/.config/waybar/script/toggle_minimal.sh",
@@ -49,7 +49,7 @@ return {
 		devices = {
 			{
 				name = "at-translated-set-2-keyboard",
-				enabled = true,
+				enabled = false,
 			},
 		},
 	},
