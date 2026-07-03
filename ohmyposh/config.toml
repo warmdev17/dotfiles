@@ -1,0 +1,67 @@
+"$schema" = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json"
+version = 4
+final_space = true
+
+[palette]
+os = "#A6E3A1"
+pink = "#F5C2E7"
+lavender = "#B4BEFE"
+blue = "#89B4FA"
+closer = "#ACB0BE"
+
+[[blocks]]
+type = "prompt"
+alignment = "left"
+
+[[blocks.segments]]
+type = "python"
+style = "plain"
+foreground = "p:os"
+template = "( {{ .Full }}) "
+
+[blocks.segments.properties]
+display_mode = "environment"
+
+[[blocks.segments]]
+type = "path"
+style = "plain"
+foreground = "p:pink"
+template = "{{ if eq .PWD \"~\" }}~{{ else }}{{ .Folder }}{{ end }}"
+
+[blocks.segments.properties]
+style = "folder"
+home_icon = "~"
+
+[[blocks.segments]]
+type = "git"
+style = "plain"
+foreground = "p:lavender"
+template = " {{ .HEAD }} "
+
+[blocks.segments.properties]
+branch_icon = "\ue725 "
+cherry_pick_icon = "\ue29b "
+commit_icon = "\uf417 "
+fetch_status = false
+fetch_upstream_icon = false
+merge_icon = "\ue727 "
+no_commits_icon = "\uf0c3 "
+rebase_icon = "\ue728 "
+revert_icon = "\uf0e2 "
+tag_icon = "\uf412 "
+
+[[blocks]]
+type = "prompt"
+alignment = "left"
+newline = true
+
+[[blocks.segments]]
+type = "text"
+style = "plain"
+foreground = "p:closer"
+template = "\uf105"
+
+[transient_prompt]
+background = "transparent"
+foreground = "p:closer"
+template = "\uf105 "
