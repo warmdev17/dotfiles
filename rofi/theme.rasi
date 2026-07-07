@@ -1,0 +1,103 @@
+/**
+ * Catppuccin Mocha theme (accent = blue)
+ * Color palette: https://catppuccin.com/palette
+ * Base from: https://github.com/hiimsergey/rofi-catppuccin
+ */
+
+* {
+    base:       rgba(30, 30, 46, 0.5); 
+    surface0:   #313244;
+    overlay0:   #6c7086;
+    text:       #cdd6f4;
+    blue:       #89b4fa;   /* accent */
+    mauve:      #cba6f7;
+    red:        #f38ba8;
+    peach:      #fab387;
+    green:      #a6e3a1;
+    lavender:   #b4befe;
+    background-color: @base;
+    text-color:       @text;
+}
+
+window {
+    height: 600;
+    width: 800;
+    border: 2;
+    border-radius: 5;
+    border-color: @blue;
+    background-color: @base;
+}
+
+mainbox {
+    spacing: 0;
+    children: [inputbar, message, listview];
+    background-color: @base;
+}
+
+inputbar {
+    color: @text;
+    padding: 14;
+    background-color: transparent;
+}
+
+prompt {
+    margin: 0 10 0 0;
+    text-color: inherit;
+    background-color: transparent;
+}
+
+entry, case-indicator {
+    text-color: inherit;
+    background-color: inherit;
+}
+
+message {
+    padding: 10;
+    background-color: @overlay0;
+    text-color: @base;
+}
+
+listview {
+    padding: 8;
+    border-radius: 0 0 10 10;
+    border: 2 2 2 2;
+    border-color: transparent;
+    background-color: transparent;
+    dynamic: false;
+}
+
+textbox {
+    text-color: @text;
+    background-color: inherit;
+}
+
+error-message {
+    border: 20 20 20 20;
+    background-color: @base;
+    text-color: @text;
+}
+
+element {
+    padding: 5;
+    vertical-align: 0.5;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+element selected {
+    background-color: @blue;
+}
+
+element-text,
+element-icon {
+    size: 40;
+    margin: 0 10 0 0;
+    vertical-align: 0.5;
+    background-color: inherit;
+    text-color: @text;
+}
+
+element-text selected,
+element-icon selected {
+    text-color: #1e1e2e;
+}

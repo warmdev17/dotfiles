@@ -1,0 +1,23 @@
+@import "~/.config/rofi/theme_minimal.rasi"
+
+configuration {
+    show-icons: true;
+    display-dmenu: " Clipboard";
+}
+
+element {
+    orientation: horizontal;
+    padding: 6px;
+    spacing: 10px;
+}
+
+element-icon {
+    size: 96px;
+    horizontal-align: 0.0;
+}
+
+element-text {
+    expand: true;
+    vertical-align: 0.5;
+    text-color: inherit;
+}

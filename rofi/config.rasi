@@ -1,0 +1,13 @@
+configuration {
+    show-icons: true;
+    icon-theme: "Papirus-Dark";
+    kb-row-up:    "Control+k";
+    kb-row-down:  "Control+j";
+    kb-accept-entry: "Return,Control+m,KP_Enter";
+    kb-remove-to-eol: "Control+Shift+k";
+    kb-cancel: "Escape,Control+bracketleft";
+    terminal: "kitty";
+}
+
+
+@theme "~/.config/rofi/theme.rasi"

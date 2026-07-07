@@ -1,0 +1,49 @@
+@import "~/.config/rofi/theme.rasi"
+
+configuration {
+    show-icons: true;
+    display-dmenu: "󰸉 Wallpaper";
+}
+
+window {
+    width: 60%;
+    height: 70%;
+}
+
+mainbox {
+    children: [inputbar, listview];
+}
+
+listview {
+    layout: vertical;
+
+    columns: 3;
+    lines: 3;
+
+    fixed-columns: true;
+    fixed-height: false;
+
+    spacing: 12px;
+    scrollbar: true;
+}
+
+element {
+    orientation: vertical;
+    padding: 10px;
+    spacing: 6px;
+
+    width: 1em;
+}
+
+element-icon {
+    size: 128px;
+    margin: 0 0 8px 0;
+}
+
+element-text {
+    horizontal-align: 0.5;
+}
+
+element selected {
+  border-radius: 5px;
+}
