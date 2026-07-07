@@ -5,21 +5,40 @@ set -e
 # CONFIG
 # =========================
 SAVEDIR="$HOME/Pictures/Screenshots"
-mkdir -p "$SAVEDIR"
+TMPDIR="/tmp/hyprshot"
+mkdir -p "$SAVEDIR" "$TMPDIR"
 
-IMG_NAME="screenshot_$(date +'%Y-%m-%d_%H-%M-%S')"
-TIMEOUT=5000
+IMG_NAME="screenshot_$(date +'%a-%d-%m-%Y_%Hh-%Mm-%Ss')"
+TIMEOUT=4000
+SOUND="/home/warmdev/Music/sound/screenshot.mp3"
 
-mode="$1"   # fullscreen | region | window
-target="$2" # file | clipboard
+mode="$1"    # fullscreen | region | window
+target="$2"  # file | clipboard
+preview="$3" # preview (optional)
 
 # =========================
 # CHECK ARGUMENTS
 # =========================
 if [[ -z "$mode" || -z "$target" ]]; then
-  echo "Usage: $0 {fullscreen|region|window} {file|clipboard}"
+  echo "Usage: $0 {fullscreen|region|window} {file|clipboard} [preview]"
   exit 1
 fi
+
+# =========================
+# PATH RESOLUTION
+# =========================
+if [[ "$target" == "file" ]]; then
+  OUTFILE="$SAVEDIR/${IMG_NAME}-${mode}.png"
+else
+  OUTFILE="$TMPDIR/${IMG_NAME}-${mode}.png"
+fi
+
+# =========================
+# SOUND
+# =========================
+play_sound() {
+  [[ -f "$SOUND" ]] && paplay "$SOUND" &
+}
 
 # =========================
 # NOTIFICATION
@@ -31,14 +50,27 @@ notify() {
 }
 
 # =========================
-# SAVE PIPE
+# PREVIEW
 # =========================
-save_pipe() {
-  if [[ "$target" == "file" ]]; then
-    tee "$SAVEDIR/${IMG_NAME}-${mode}.png" | wl-copy
-  else
-    wl-copy
-  fi
+show_preview() {
+  [[ "$preview" != "preview" ]] && return 0
+
+  feh "$OUTFILE" \
+    --title "Screenshot preview" \
+    --borderless \
+    --auto-zoom \
+    --scale-down \
+    --geometry +30+30 \
+    --class "feh-preview" &
+}
+
+# =========================
+# FINALIZE IMAGE
+# =========================
+finalize() {
+  wl-copy <"$OUTFILE"
+  show_preview
+  notify
 }
 
 # =========================
@@ -46,13 +78,15 @@ save_pipe() {
 # =========================
 case "$mode" in
 fullscreen)
-  grim - | save_pipe
+  play_sound
+  grim "$OUTFILE"
   ;;
 
 region)
   geometry=$(slurp)
   [[ -z "$geometry" ]] && exit 0
-  grim -g "$geometry" - | save_pipe
+  play_sound
+  grim -g "$geometry" "$OUTFILE"
   ;;
 
 window)
@@ -70,7 +104,8 @@ window)
   )
 
   [[ -z "$geometry" ]] && exit 0
-  grim -g "$geometry" - | save_pipe
+  play_sound
+  grim -g "$geometry" "$OUTFILE"
   ;;
 
 *)
@@ -79,4 +114,4 @@ window)
   ;;
 esac
 
-notify
+finalize
