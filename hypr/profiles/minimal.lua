@@ -8,13 +8,13 @@ return {
 			config = "/home/warmdev/.config/waybar/profiles/minimal/config.jsonc",
 			style = "/home/warmdev/.config/waybar/profiles/minimal/style.css",
 		},
-		wallpaper = { selector = "" },
+		wallpaper = { selector = "~/.config/hypr/script/wallpaper_selector.sh" },
 	},
 
 	autostart = {
 		waybar = "waybar -c {{waybar.config}} -s {{waybar.style}}",
 		wallpaper_daemon = "awww-daemon",
-		wallpaper_cmd = "sleep 1 && awww img $HOME/Pictures/wallpapers/solid-color-image.png --transition-type none",
+		wallpaper_cmd = "sleep 1 && awww img $HOME/Pictures/wallpapers/MaiPhuongDangIu.jpg --transition-type none",
 	},
 
 	-- 3. EXEC (Runs on EVERY reload / profile switch)
@@ -33,8 +33,8 @@ return {
 				enabled = false,
 			},
 			general = {
-				gaps_in = 0,
-				gaps_out = 0,
+				gaps_in = 8,
+				gaps_out = 12,
 				border_size = 1,
 			},
 			decoration = {
