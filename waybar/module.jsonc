@@ -1,0 +1,110 @@
+{
+  "hyprland/workspaces": {
+    "on-click": "activate",
+    "format": "{}",
+    "format-icons": {
+      "urgent": "",
+      "active": "",
+      "default": "",
+    },
+    "all-outputs": false,
+    "persistent-workspaces": {},
+  },
+
+  "hyprland/window": {
+    "separate-outputs": true,
+    "max-length": 30,
+  },
+  "custom/launcher": {
+    "format": "",
+    "on-click": "rofi -show drun",
+    "on-click-right": "rofi -show run",
+    "on-click-middle": "wlogout",
+    "tooltip": false,
+  },
+
+  "custom/exit": {
+    "format": "  ",
+    "on-click": "wlogout",
+    "on-click-right": "sh -c \"~/.config/hypr/script/lockscreen.sh\"",
+    "tooltip-format": "Left: Power menu\nRight: Lock screen",
+  },
+  "tray": {
+    "spacing": 10,
+  },
+  "clock": {
+    "format": "{:%H:%M - %a %d}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "format-alt": "{:%d-%m-%Y}",
+    "calendar": {
+      "mode": "year",
+      "mode-mon-col": 3,
+      "weeks-pos": "right",
+      "on-scroll": 1,
+      "format": {
+        "months": "<span color='#89b4fa'><b>{}</b></span>",
+        "days": "<span color='#cdd6f4'><b>{}</b></span>",
+        "weeks": "<span color='#a6e3a1'><b>W{}</b></span>",
+        "weekdays": "<span color='#fab387'><b>{}</b></span>",
+        "today": "<span color='#f38ba8'><b><u>{}</u></b></span>",
+      },
+    },
+  },
+  "cpu": {
+    "format": "{usage}% ",
+    "tooltip": false,
+  },
+  "memory": {
+    "format": "{}%  ",
+  },
+  "backlight": {
+    "format": "{percent}% {icon}",
+    "format-icons": ["", "", "", "", "", "", "", "", ""],
+  },
+  "battery": {
+    "states": {
+      "good": 95,
+      "warning": 30,
+      "critical": 15,
+    },
+    "format": "{capacity}% {icon}",
+    "format-full": "{capacity}% {icon}",
+    "format-charging": "{capacity}% ",
+    "format-plugged": "{capacity}% ",
+    "format-alt": "{time} {icon}",
+    // "format-good": "", // An empty format will hide the module
+    // "format-full": "",
+    "format-icons": ["", "", "", "", ""],
+  },
+  "pulseaudio": {
+    // "scroll-step": 1, // %, can be a float
+    "format": "{volume}% {icon} {format_source}",
+    "format-bluetooth": "{volume}% {icon}",
+    "format-bluetooth-muted": " {icon} {format_source}",
+    "format-muted": "{volume}%  {format_source}",
+    "format-source": "",
+    "format-source-muted": "",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": ["", "", ""],
+    },
+    "on-click": "pavucontrol",
+  },
+  "custom/scrcpy": {
+    "exec": "~/.config/waybar/scripts/scrcpy_status.sh",
+
+    "interval": 1,
+
+    "on-click": "bash -lc 'pgrep -x scrcpy >/dev/null && pkill -x scrcpy || scrcpy --video-codec=h265 --max-size=1920 --max-fps=60 --no-audio --keyboard=uhid'",
+
+    "on-click-right": "bash -lc 'pgrep -x scrcpy >/dev/null && pkill -x scrcpy || scrcpy -s 24d2ee04 --video-source=camera --camera-size=1920x1080 --camera-facing=back --v4l2-sink=/dev/video10 --no-playback'",
+
+    "tooltip": true,
+    "return-type": "json",
+  },
+}

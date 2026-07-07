@@ -1,0 +1,183 @@
+* {
+  /* `otf-font-awesome` is required to be installed for icons */
+  /* font-family: FontAwesome, Roboto, Helvetica, Arial, sans-serif; */
+  font-family: "JetBrainsMono Nerd Font", sans-serif;
+  font-size: 14px;
+}
+
+window#waybar {
+  background-color: rgba(30, 30, 46, 0.85);
+  color: #cdd6f4;
+  transition-property: background-color;
+  transition-duration: 0.5s;
+  border-radius: 8px;
+  border: none;
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+#custom-launcher {
+  font-size: 18px;
+  margin: 5px 0;
+  margin-left: 6px;
+  margin-right: 2px;
+  padding-left: 10px;
+  padding-right: 9px;
+  border-radius: 3px;
+  transition: none;
+  color: #cdd6f4;
+  background: transparent;
+}
+
+#custom-exit {
+  margin-right: 5px;
+  background-color: transparent;
+}
+
+#workspaces button {
+  padding: 0 8px;
+  background-color: rgba(49, 50, 68, 0.7);
+  margin: 5px 0;
+  border-radius: 8px;
+  color: #cdd6f4;
+  margin-left: 5px;
+  font-weight: bold;
+}
+
+#workspaces button:hover {
+  background-color: #89b4fa;
+  color: #1e1e2e;
+  padding: 0 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+#workspaces button.focused {
+  background-color: #89b4fa;
+}
+
+#workspaces button.active {
+  color: #1e1e2e;
+  background-color: #89b4fa;
+  padding: 0 20px;
+  transition: all 0.3s ease-in-out;
+  font-weight: bold;
+}
+
+#workspaces button.urgent {
+  background-color: #f38ba8;
+  color: #1e1e2e;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#backlight,
+#pulseaudio,
+#pulseaudio.muted,
+#tray {
+  padding: 0 10px;
+  margin: 5px 0;
+  border-radius: 2px;
+  background-color: transparent;
+}
+
+#tray {
+  padding-right: 0;
+}
+
+#window,
+#workspaces {
+  margin: 0 4px;
+}
+
+#submap {
+  background-color: #89b4fa;
+  color: #1e1e2e;
+  padding: 0 5px;
+  margin: 5px 0;
+  border-radius: 2px;
+}
+
+tooltip {
+  background-color: rgba(30, 30, 46, 0.85);
+}
+
+tooltip label {
+  color: #cdd6f4;
+}
+
+/* If workspaces is the leftmost module, omit left margin */
+.modules-left > widget:first-child > #workspaces {
+  margin-left: 0;
+}
+
+/* If workspaces is the rightmost module, omit right margin */
+.modules-right > widget:last-child > #workspaces {
+  margin-right: 0;
+}
+
+@keyframes blink {
+  to {
+    color: #f38ba8;
+  }
+}
+
+/* Using steps() instead of linear as a timing function to limit cpu usage */
+#battery.critical:not(.charging) {
+  background-color: transparent;
+  color: #cdd6f4;
+  animation-name: blink;
+  animation-duration: 0.5s;
+  animation-timing-function: steps(12);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+#tray {
+  margin-right: 7px;
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+  background-color: #f38ba8;
+}
+
+#pulseaudio {
+  color: #cba6f7;
+}
+
+#pulseaudio.muted {
+  color: #6c7086;
+}
+
+#cpu {
+  color: #89b4fa;
+}
+
+#memory {
+  color: #fab387;
+}
+
+#backlight {
+  color: #94e2d5;
+}
+
+#battery {
+  color: #a6e3a1;
+}
+
+#battery.plugged {
+  color: #a6e3a1;
+}
+
+#battery.critical {
+  color: #f38ba8;
+}

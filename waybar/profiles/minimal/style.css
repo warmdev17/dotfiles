@@ -1,0 +1,182 @@
+* {
+  /* `otf-font-awesome` is required to be installed for icons */
+  /* font-family: FontAwesome, Roboto, Helvetica, Arial, sans-serif; */
+  font-family: "JetBrainsMono Nerd Font", sans-serif;
+  font-size: 20px;
+}
+
+window#waybar {
+  background-color: #181825;
+  color: #cdd6f4;
+  transition-property: background-color;
+  transition-duration: 0.5s;
+  border-radius: 0px;
+  border: none;
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+#workspaces button {
+  padding: 0 8px;
+  background-color: #181825;
+  margin: 0px 0;
+  color: #cdd6f4;
+  font-weight: bold;
+  border-radius: 0;
+}
+
+#workspaces button:hover {
+  background-color: #89b4fa;
+  color: #1e1e2e;
+}
+
+#workspaces button.focused {
+  background-color: #89b4fa;
+}
+
+#workspaces button.active {
+  color: #1e1e2e;
+  background-color: #89b4fa;
+  transition: all 0.3s ease-in-out;
+  font-weight: bold;
+}
+
+#workspaces button.urgent {
+  background-color: #f38ba8;
+  color: #1e1e2e;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#backlight,
+#pulseaudio,
+#pulseaudio.muted,
+#tray {
+  padding: 0 10px;
+  margin: 5px 0;
+  border-radius: 2px;
+  background-color: transparent;
+}
+
+#tray {
+  padding-right: 0;
+}
+
+#window,
+#workspaces {
+  margin: 0 4px;
+}
+
+#submap {
+  background-color: #89b4fa;
+  color: #1e1e2e;
+  padding: 0 5px;
+  margin: 5px 0;
+  border-radius: 2px;
+}
+
+tooltip {
+  background-color: rgba(30, 30, 46, 0.85);
+}
+
+tooltip label {
+  color: #cdd6f4;
+}
+
+/* If workspaces is the leftmost module, omit left margin */
+.modules-left > widget:first-child > #workspaces {
+  margin-left: 0;
+}
+
+/* If workspaces is the rightmost module, omit right margin */
+.modules-right > widget:last-child > #workspaces {
+  margin-right: 0;
+}
+
+/* Using steps() instead of linear as a timing function to limit cpu usage */
+#battery.critical:not(.charging) {
+  background-color: transparent;
+  color: #cdd6f4;
+}
+
+#tray {
+  margin-right: 7px;
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+  background-color: #f38ba8;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#backlight,
+#pulseaudio,
+#pulseaudio.muted,
+#tray {
+  padding: 0 10px;
+  margin: 5px 0;
+  border-radius: 2px;
+  background-color: transparent;
+  color: #cdd6f4;
+}
+
+/* Default */
+#cpu,
+#memory,
+#backlight,
+#battery {
+  color: #cdd6f4;
+}
+
+/* CPU */
+#cpu.warning {
+  color: #f9e2af; /* yellow */
+}
+
+#cpu.critical {
+  color: #f38ba8; /* red */
+}
+
+/* Memory */
+#memory.warning {
+  color: #f9e2af;
+}
+
+#memory.critical {
+  color: #f38ba8;
+}
+
+/* Brightness */
+#backlight.low {
+  color: #f9e2af;
+}
+
+/* Battery */
+#battery.warning {
+  color: #fab387; /* orange */
+}
+
+#battery.critical {
+  color: #f38ba8; /* red */
+}
+
+#battery.charging {
+  color: #a6e3a1; /* green */
+}
+
+#battery.full {
+  color: #94e2d5; /* teal */
+}
