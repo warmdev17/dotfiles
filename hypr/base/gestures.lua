@@ -10,18 +10,8 @@ return {
 		direction = "down",
 		action = "float",
 	},
-	{
-		fingers = 3,
-		mods = "SUPER",
-		direction = "horizontal",
-		action = "move",
-	},
-	{
-		fingers = 3,
-		mods = "SUPER",
-		direction = "vertical",
-		action = "resize",
-	},
+
+
 	{
 		fingers = 2,
 		direction = "pinch",
