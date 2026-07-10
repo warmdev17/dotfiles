@@ -139,7 +139,16 @@ function M.apply(cfg)
 		end)
 	end
 
-	-- 6. Apply exec
+	-- 6. Apply gestures
+	if cfg.gestures then
+		for _, g in ipairs(cfg.gestures) do
+			if hl.gesture then
+				hl.gesture(g)
+			end
+		end
+	end
+
+	-- 7. Apply exec
 	if cfg.exec then
 		for _, cmd in pairs(cfg.exec) do
 			if cmd and cmd ~= "" then

@@ -6,4 +6,5 @@ return {
 	binds = require("base.binds"),
 	options = merge(require("base.options"), require("base.animations")),
 	rules = require("base.rules"),
+	gestures = require("base.gestures"),
 }

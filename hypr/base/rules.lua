@@ -17,6 +17,11 @@ return {
 			border_color = { colors = { "rgb(89b4fa)", "rgb(89b4fa)" } },
 		},
 		{
+			match = { class = "xdg-desktop-portal-gtk" },
+			float = true,
+			center = true,
+		},
+		{
 			match = { class = "Emulator" },
 			float = true,
 			no_blur = false,
